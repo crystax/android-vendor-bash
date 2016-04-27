@@ -22,7 +22,7 @@ do
 	case $x in
 	$0|run-minimal|run-gprof)	;;
 	*.orig|*~) ;;
-	*)	echo $x ; sh $x ;;
+	*)	echo "=== RUN $x" ; sh $x ;;
 	esac
 done
 

@@ -118,7 +118,7 @@ MACHTYPE = @host@
 DEBUG = @DEBUG@
 MALLOC_DEBUG = @MALLOC_DEBUG@
 
-THIS_SH = $(BUILD_DIR)/$(Program)
+THIS_SH = $(LAUNCHER) $(BUILD_DIR)/$(Program)
 
 # PROFILE_FLAGS is either -pg, to generate profiling info for use
 # with gprof, or nothing (the default).
@@ -848,22 +848,22 @@ maybe-clean:
 	fi
 
 recho$(EXEEXT):		$(SUPPORT_SRC)recho.c
-	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) ${LDFLAGS_FOR_BUILD} -o $@ $(SUPPORT_SRC)recho.c ${LIBS_FOR_BUILD}
+	@$(CC) $(CCFLAGS) ${LDFLAGS} -o $@ $(SUPPORT_SRC)recho.c
 
 zecho$(EXEEXT):		$(SUPPORT_SRC)zecho.c
-	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) ${LDFLAGS_FOR_BUILD} -o $@ $(SUPPORT_SRC)zecho.c ${LIBS_FOR_BUILD}
+	@$(CC) $(CCFLAGS) ${LDFLAGS} -o $@ $(SUPPORT_SRC)zecho.c
 
 printenv$(EXEEXT):	$(SUPPORT_SRC)printenv.c
-	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) ${LDFLAGS_FOR_BUILD} -o $@ $(SUPPORT_SRC)printenv.c ${LIBS_FOR_BUILD}
+	@$(CC) $(CCFLAGS) ${LDFLAGS} -o $@ $(SUPPORT_SRC)printenv.c
 
 xcase$(EXEEXT):	$(SUPPORT_SRC)xcase.c
-	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) ${LDFLAGS_FOR_BUILD} -o $@ $(SUPPORT_SRC)xcase.c ${LIBS_FOR_BUILD}
+	@$(CC) $(CCFLAGS) ${LDFLAGS} -o $@ $(SUPPORT_SRC)xcase.c
 
 test tests check:	force $(Program) $(TESTS_SUPPORT)
 	@-test -d tests || mkdir tests
 	@cp $(TESTS_SUPPORT) tests
 	@( cd $(srcdir)/tests && \
-		PATH=$(BUILD_DIR)/tests:$$PATH THIS_SH=$(THIS_SH) $(SHELL) ${TESTSCRIPT} )
+		PATH=$(BUILD_DIR)/tests:$$PATH THIS_SH='$(THIS_SH)' $(SHELL) ${TESTSCRIPT} )
 
 symlinks:
 	$(SHELL) $(SUPPORT_SRC)fixlinks -s $(srcdir)
