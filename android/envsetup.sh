@@ -134,21 +134,30 @@ esac
 CROSS=$NDK/toolchains/${TCNAME}-${GCC_VERSION}/prebuilt/${HOST_TAG}/bin/${TARGET}
 
 BINDIR=$OUTDIR/bin
-LIBDIR=$OUTDIR/lib
+SYSROOT=$OUTDIR/sysroot
 
-rm -Rf $BINDIR $LIBDIR || return 1
-
+rm -Rf $BINDIR || return 1
 mkdir -p $BINDIR || return 1
-mkdir -p $LIBDIR || return 1
 
-cp -f $NDK/sources/crystax/libs/$ABI/libcrystax.a $LIBDIR/ || return 1
+mkdir -p $SYSROOT/ || return 1
+rsync -a --delete $NDK/platforms/android-${APILEVEL}/arch-${ARCH}/ $SYSROOT/ || return 1
+find $SYSROOT/ -name 'libcrystax.*' -delete
+cp -f $NDK/sources/crystax/libs/$ABI/libcrystax.a $SYSROOT/usr/lib/ || return 1
 
 {
     echo "#!/bin/sh"
     echo "exec $NDK/tools/adbrunner --abi=$ABI --log=$OUTDIR/adbrunner.log --pie \"\$@\""
-} | cat >$BINDIR/adbrunner
+} | cat >$BINDIR/${TARGET}-adbrunner
 test $? -eq 0 || return 1
-chmod +x $BINDIR/adbrunner || return 1
+chmod +x $BINDIR/${TARGET}-adbrunner || return 1
+
+LAUNCHER=$BINDIR/${TARGET}-adbrunner
+export LAUNCHER
+
+upcase()
+{
+    echo "$@" | tr '[a-z]' '[A-Z]'
+}
 
 mktool()
 {
@@ -166,8 +175,7 @@ mktool()
             gcc)
                 CMD="$CMD ${ARCHFLAGS}"
                 CMD="$CMD -fPIE -pie"
-                CMD="$CMD --sysroot=$NDK/platforms/android-${APILEVEL}/arch-${ARCH}"
-                CMD="$CMD -L$LIBDIR"
+                CMD="$CMD --sysroot=$SYSROOT"
                 CMD="$CMD $LFLAGS"
                 ;;
         esac
@@ -180,10 +188,8 @@ mktool()
 
 for tool in gcc as ar ranlib strip; do
     mktool $tool || return 1
+    eval $(upcase $tool)=$BINDIR/${TARGET}-${tool}
 done
-
-LAUNCHER=$BINDIR/adbrunner
-export LAUNCHER
 
 PATH=$BINDIR:$PATH
 export PATH

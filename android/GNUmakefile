@@ -3,7 +3,12 @@ override TOPDIR := $(abspath $(MYDIR)/..)
 
 sinclude $(TOPDIR)/local.mk
 
-ABI ?= armeabi-v7a-hard
+#ABI ?= armeabi-v7a-hard
+ABI ?= arm64-v8a
+
+ifeq (,$(strip $(NDK)))
+NDK := $(abspath $(wildcard $(TOPDIR)/../../platform/ndk))
+endif
 
 #==================================================================================================
 
@@ -32,6 +37,11 @@ all: bash
 clean:
 	$(call rm-if-exists,$(call out-dir))
 
+.PHONY: rebuild
+rebuild:
+	$(MAKE) clean
+	$(MAKE) all
+
 .PHONY: bash
 bash:
 	$(if $(strip $(NDK)),,$(error NDK was not defined!))
@@ -47,7 +57,7 @@ bash:
 			--prefix=$(call install-dir,$(ABI)) \
 			--host=$$TARGET \
 			--disable-nls \
-			--disable-readline \
+			--enable-readline \
 			--enable-alias \
 			--enable-arith-for-command \
 			--enable-array-variables \
@@ -60,6 +70,8 @@ bash:
 			&& \
 		make -j && \
 		make install && \
+		cp -f $(call install-dir,$(ABI))/bin/bash $(call out-dir,$(ABI))/ && \
+		$$STRIP --strip-unneeded $(call out-dir,$(ABI))/bash && \
 		true \
 	)
 
