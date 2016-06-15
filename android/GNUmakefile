@@ -57,13 +57,31 @@ bash:
 			--prefix=$(call install-dir,$(ABI)) \
 			--host=$$TARGET \
 			--disable-nls \
-			--enable-readline \
+			--disable-rpath \
 			--enable-alias \
 			--enable-arith-for-command \
 			--enable-array-variables \
 			--enable-brace-expansion \
-			--enable-direxpand-default \
+			--enable-casemod-attributes \
+			--enable-casemod-expansions \
+			--enable-command-timing \
+			--enable-cond-command \
+			--enable-cond-regexp \
+			--enable-coprocesses \
+			--enable-debugger \
 			--enable-directory-stack \
+			--enable-dparen-arithmetic \
+			--enable-extended-glob \
+			--enable-help-builtin \
+			--enable-history \
+			--enable-job-control \
+			--enable-multibyte \
+			--enable-net-redirections \
+			--enable-process-substitution \
+			--enable-progcomp \
+			--enable-readline \
+			--enable-select \
+			--enable-xpg-echo-default \
 			--without-bash-malloc \
 			--without-libintl-prefix \
 			--without-libiconv-prefix \
