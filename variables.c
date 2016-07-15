@@ -855,6 +855,10 @@ set_pwd ()
     }
   else
     {
+#if __ANDROID__
+      chdir("/");
+      set_working_directory("/");
+#endif
       temp_string = get_working_directory ("shell-init");
       if (temp_string)
 	{
